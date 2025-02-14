@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: project-query-service
+  data:
+    mongodb:
+      database: projectDatabase
+      uri: mongodb://localhost:27017/projectDatabase
+      authentication-database: projectDatabase
+  kafka:
+    bootstrap-servers: localhost:10094
+    consumer:
+      group-id: project-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+server:
+  address: '0.0.0.0'
+  port: 10052
+env:
+  kafka:
+    topicEvent: project-event
