@@ -87,7 +87,7 @@ jobs:
             echo "📌 Iniciando el nuevo contenedor con variables de entorno..."
             sudo docker run -d \
               --name ${{ secrets.DOCKER_IMAGE_NAME }} \
-              -p 80:10052 \
+              -p 10052:10052 \
               -e SPRING_DATA_MONGODB_DATABASE=${{ secrets.SPRING_DATA_MONGODB_DATABASE }} \
               -e SPRING_DATA_MONGODB_URI=${{ secrets.SPRING_DATA_MONGODB_URI }} \
               -e SPRING_DATA_MONGODB_AUTHENTICATION-DATABASE=${{ secrets.SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE }} \
