@@ -20,10 +20,12 @@ import java.util.Optional;
 public class ProjectEventListenerService {
 
     private final IProjectRepository projectRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public ProjectEventListenerService(IProjectRepository projectRepository) {
+    public ProjectEventListenerService(IProjectRepository projectRepositor, ObjectMapper objectMappery) {
         this.projectRepository = projectRepository;
+        this.objectMapper = objectMapper;
     }
 
     @KafkaListener(topics = "${env.kafka.topicEvent}")
@@ -32,7 +34,7 @@ public class ProjectEventListenerService {
         switch (eventType) {
             case "CREATE_PROJECT":
                 try {
-                    Project project = new ObjectMapper().readValue(payload, Project.class);
+                    Project project = objectMapper.readValue(payload, Project.class);
                     projectRepository.save(project);
                 } catch (JsonProcessingException e) {
                     System.err.println("Error parsing Person JSON: " + e.getMessage());
@@ -40,7 +42,7 @@ public class ProjectEventListenerService {
                 break;
             case "SET_TEAM":
                 try {
-                    ProjectTeam projectTeam = new ObjectMapper().readValue(payload, ProjectTeam.class);
+                    ProjectTeam projectTeam = objectMapper.readValue(payload, ProjectTeam.class);
                     Optional<Project> optionalProject = projectRepository.findById(projectTeam.projectElementId());
                     optionalProject.ifPresent(project -> {
                         project.setTeamElementId(projectTeam.teamElementId());
@@ -52,7 +54,7 @@ public class ProjectEventListenerService {
                 break;
             case "SET_TUTOR":
                 try {
-                    ProjectPerson projectPerson = new ObjectMapper().readValue(payload, ProjectPerson.class);
+                    ProjectPerson projectPerson = objectMapper.readValue(payload, ProjectPerson.class);
                     Optional<Project> optionalProject = projectRepository.findById(projectPerson.projectElementId());
                     optionalProject.ifPresent(project -> {
                         project.setLeaderElementId(projectPerson.personElementId());
@@ -64,7 +66,7 @@ public class ProjectEventListenerService {
                 break;
             case "SET_OBJECTIVE":
                 try {
-                    ProjectObjective projectObjective = new ObjectMapper().readValue(payload, ProjectObjective.class);
+                    ProjectObjective projectObjective = objectMapper.readValue(payload, ProjectObjective.class);
                     Optional<Project> optionalProject = projectRepository.findById(projectObjective.projectElementId());
                     optionalProject.ifPresent(project -> {
                         project.getObjectiveElementId().add(projectObjective.objectiveElementId());
@@ -76,7 +78,7 @@ public class ProjectEventListenerService {
                 break;
             case "SET_TASK":
                 try {
-                    ProjectTask projectTask = new ObjectMapper().readValue(payload, ProjectTask.class);
+                    ProjectTask projectTask = objectMapper.readValue(payload, ProjectTask.class);
                     Optional<Project> optionalProject = projectRepository.findById(projectTask.projectElementId());
                     optionalProject.ifPresent(project -> {
                         project.getTaskElementId().add(projectTask.taskElementId());
@@ -88,7 +90,7 @@ public class ProjectEventListenerService {
                 break;
             case "UPDATE_PROJECT":
                 try {
-                    Project project = new ObjectMapper().readValue(payload, Project.class);
+                    Project project = objectMapper.readValue(payload, Project.class);
                     Optional<Project> optionalProject = projectRepository.findById(project.getId());
                     optionalProject.ifPresent(existingRole -> projectRepository.save(project));
                 } catch (JsonProcessingException e) {
@@ -101,7 +103,7 @@ public class ProjectEventListenerService {
                 break;
             case "REMOVE_TEAM":
                 try {
-                    ProjectTeam projectTeam = new ObjectMapper().readValue(payload, ProjectTeam.class);
+                    ProjectTeam projectTeam = objectMapper.readValue(payload, ProjectTeam.class);
                     Optional<Project> projectOptional = projectRepository.findById(projectTeam.projectElementId());
                     projectOptional.ifPresent(project -> {
                         project.setTeamElementId(null);
@@ -113,7 +115,7 @@ public class ProjectEventListenerService {
                 break;
             case "REMOVE_TUTOR":
                 try {
-                    ProjectPerson projectPerson = new ObjectMapper().readValue(payload, ProjectPerson.class);
+                    ProjectPerson projectPerson = objectMapper.readValue(payload, ProjectPerson.class);
                     Optional<Project> projectOptional = projectRepository.findById(projectPerson.projectElementId());
                     projectOptional.ifPresent(project -> {
                         project.setLeaderElementId(null);
@@ -125,7 +127,7 @@ public class ProjectEventListenerService {
                 break;
             case "REMOVE_OBJECTIVE":
                 try {
-                    ProjectObjective projectObjective = new ObjectMapper().readValue(payload, ProjectObjective.class);
+                    ProjectObjective projectObjective = objectMapper.readValue(payload, ProjectObjective.class);
                     Optional<Project> projectOptional = projectRepository.findById(projectObjective.projectElementId());
                     projectOptional.ifPresent(project -> {
                         project.getObjectiveElementId().remove(projectObjective.objectiveElementId());
@@ -137,7 +139,7 @@ public class ProjectEventListenerService {
                 break;
             case "REMOVE_TASK":
                 try {
-                    ProjectTask projectTask = new ObjectMapper().readValue(payload, ProjectTask.class);
+                    ProjectTask projectTask = objectMapper.readValue(payload, ProjectTask.class);
                     Optional<Project> projectOptional = projectRepository.findById(projectTask.projectElementId());
                     projectOptional.ifPresent(project -> {
                         project.getTaskElementId().remove(projectTask.taskElementId());
